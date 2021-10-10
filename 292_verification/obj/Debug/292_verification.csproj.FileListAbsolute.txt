@@ -1,0 +1,12 @@
+C:\WORK\292\Clear_shit\292_verification\292_verification\bin\Debug\292_verification.exe.config
+C:\WORK\292\Clear_shit\292_verification\292_verification\bin\Debug\292_verification.exe
+C:\WORK\292\Clear_shit\292_verification\292_verification\bin\Debug\292_verification.pdb
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.csprojAssemblyReference.cache
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Form1.resources
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Properties.Resources.resources
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.csproj.GenerateResource.cache
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.csproj.CoreCompileInputs.cache
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.exe
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.pdb
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Frm_numOfDevice.resources
+C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Frm_PPB.resources
