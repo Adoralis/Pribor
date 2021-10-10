@@ -10,3 +10,11 @@ C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verificat
 C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\292_verification.pdb
 C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Frm_numOfDevice.resources
 C:\WORK\292\Clear_shit\292_verification\292_verification\obj\Debug\_292_verification.Frm_PPB.resources
+D:\C#\Pribor\292_verification\obj\Debug\292_verification.csprojResolveAssemblyReference.cache
+D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Frm_numOfDevice.resources
+D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Frm_PPB.resources
+D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Properties.Resources.resources
+D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Form1.resources
+D:\C#\Pribor\292_verification\obj\Debug\292_verification.csproj.GenerateResource.Cache
+D:\C#\Pribor\292_verification\obj\Debug\292_verification.exe
+D:\C#\Pribor\292_verification\obj\Debug\292_verification.pdb

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO.Ports;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace _292_verification
 {
@@ -8,36 +10,48 @@ namespace _292_verification
     {
         public static byte[] RecievedData;
 
-        public static ushort GetCRC16(byte[] msg, ushort length)
+        /// <summary>
+        /// Функция расчета CRC16 
+        /// </summary>
+        /// <param name="msg">Код, для которого считается CRC</param>
+        /// <param name="length">Количества байт кода</param>
+        /// <returns></returns>
+        public static ushort GetCRC16(byte[] msg, ushort length)            
         {
-            const ushort polinom = 0xa001;
-            ushort code = 0xffff;
+            const ushort polinom = 0xA001;
+            ushort code = 0xFFFF;
 
             for (int i = 0; i < length; i++)
             {
                 //Для каждого байта массива
-                byte FirstByte;
-                FirstByte = (byte)(code);          //в ml помещаем младший байт 16-ти разрядного числа code (будущий СRС16)
-                FirstByte ^= msg[i];               //производим XOR между ml и msg[i] и помещаем его в ml
-                code &= 0xff00;             //обнуляем младший байт числа code
+                
+                byte FirstByte = (byte)(code);          //в FirstByte помещаем младший байт 16-ти разрядного числа code (будущий СRС16)
+                FirstByte ^= msg[i];                    //производим XOR между FirstByte и msg[i] и помещаем его в FirstByte
+                code &= 0xFF00;                         //обнуляем младший байт числа code
                 code += FirstByte;
                 for (int j = 0; j < 8; j++)
                 {
-                    //выделяем младший бит code и проверяем его на 1 или 0
-                    if ((code & 0x0001) == 1)
+                    if ((code & 0x0001) == 1)           //выделяем младший бит code и проверяем его на 1 или 0
                     {//Младший бит code = 1
-                        code >>= 1;         //сдвиг вправо на 1 бит с присвоением
-                        code ^= polinom;    //операция XOR переменных code с polinom с помещением результата в code
+                        code >>= 1;                     //сдвиг вправо на 1 бит с присвоением
+                        code ^= polinom;                //операция XOR переменных code с polinom с помещением результата в code
                     }
                     else
                     {//Младший бит code = 0
-                        code >>= 1;         //сдвиг вправо на 1 бит с присвоением
+                        code >>= 1;                     //сдвиг вправо на 1 бит с присвоением
                     }
                 }
             }
             return code;
         }//end GetCRC16
 
+        /// <summary>
+        /// Функция обработки входящих данных
+        /// </summary>
+        /// <param name="data">Данные</param>
+        /// <param name="StartByte">Стартовый байт для определения начала посылки</param>
+        /// <param name="NumByte">количество байт в посылке</param>
+        /// <returns></returns>
         public static bool DataRecieve(byte[] data, byte StartByte, byte NumByte)
         {
             byte[] newdata;
@@ -47,14 +61,14 @@ namespace _292_verification
             //Ищем начало массива
             for (ushort i = 0; i < data.Length; i++)
             {
-                if (data[i] == StartByte)
+                if (data[i] == StartByte)                               //Нашли начало посылки
                 {
-                    newdata = new byte[NumByte];    //создает новый массив из нужного кол-ва элементо куда переписывает найденные значения
+                    newdata = new byte[NumByte];                        //создает новый массив из нужного кол-ва элементо куда переписывает посылку
 
-                    for (ushort j = 0; j < (data.Length - i); j++)
+                    for (ushort j = 0; j < (data.Length - i); j++)      //Обрабатываем посылку, (data.Length - i) - потому что не учитываем стартовый байт
                     {
                         NumRecievedBytes++;
-                        newdata[j] = data[i + j];
+                        newdata[j] = data[i + j];                       //Записываем истинные байты
 
                         if (NumRecievedBytes == NumByte)
                         {//Кол-во принятых байт сравнялось с необходимым
@@ -62,17 +76,17 @@ namespace _292_verification
                             NumRecievedBytes = 0;
                             //Проверка CRC
                             //Считаем CRC16 полученного массива
-                            code_CRC16_new = Device.GetCRC16(newdata, (ushort)(newdata.Length - 2)); // Подсчет контрольной суммы нового массива
+                            code_CRC16_new = Device.GetCRC16(newdata, (ushort)(newdata.Length - 2));    // Подсчет контрольной суммы нового массива
 
-                            byte low_CRC16;                                                        //младший байт CRC16 полученного массива
-                            byte high_CRC16;                                                       //старший байт CRC16 полученного массива
+                            byte low_CRC16;                                                                                             //младший байт CRC16 полученного массива
+                            byte high_CRC16;                                                                                            //старший байт CRC16 полученного массива
 
                             //Вычленяем CRC16 из полученного массива
-                            low_CRC16 = (byte)(code_CRC16_new);
-                            high_CRC16 = (byte)((code_CRC16_new & 0xff00) >> 8);
+                            low_CRC16 = (byte)(code_CRC16_new);                                                                         //Расчет первого байта CRC
+                            high_CRC16 = (byte)((code_CRC16_new & 0xff00) >> 8);                                                        //Расчет второго байта CRC
                             //Если CRC не сошлось, то ошибка и выставление флага о неудачном приеме
                             //Сравниваем рассчитанную сумму с полученной
-                            if (newdata[(newdata.Length - 2)] != low_CRC16 && newdata[(newdata.Length - 1)] != high_CRC16)           //Проверка контрольной суммы
+                            if ((newdata[(newdata.Length - 2)] != low_CRC16) && (newdata[(newdata.Length - 1)] != high_CRC16))          //Проверка контрольной суммы
                             {
                                 return false;
                             }
@@ -98,13 +112,11 @@ namespace _292_verification
         {
             ushort code_CRC16;
 
-            code_CRC16 = Device.GetCRC16(data, (ushort)data.Length);
-            byte crc_l;
-            byte crc_h;
-            crc_l = (byte)(code_CRC16);
-            code_CRC16 &= 0xff00;             //обнуляем младший байт числа code
-            crc_h = (byte)(code_CRC16 >> 8);
-            byte[] msg = new byte[data.Length + 2];// {data[0],data[1],data[2],  m2, m3 };
+            code_CRC16 = Device.GetCRC16(data, (ushort)data.Length);                //расчет CRC на входные данные
+            byte crc_l = (byte)(code_CRC16);
+            code_CRC16 &= 0xff00;                                                   //обнуляем младший байт числа code
+            byte crc_h = (byte)(code_CRC16 >> 8);
+            byte[] msg = new byte[data.Length + 2];                                 // {data[0],data[1],data[2],  m2, m3 };
             //формируем посылку
             for (int i = 0; i < data.Length; i++)
                 msg[i] = data[i];
@@ -131,23 +143,31 @@ namespace _292_verification
             return message;
         }
 
-        public int Port_finder()
+        public bool Port_finder()
         {
-            SerialPort sp = new SerialPort();
-            for (int i = 0; i < 9; i++)
+            string[] ports = SerialPort.GetPortNames();
+            bool done = false;
+
+            foreach (string port in ports)
             {
-                sp.PortName = $"COM{i}";
+                string sign = "0xFE";                               //признак КПрА
+
+                SerialPort sp = new SerialPort();
+                sp.PortName = port;                                 
                 sp.Open();
                 if (sp.IsOpen)
                 {
-                    return 1;
+                    sp.Write(sign);
+                    Task.Delay(1000);
+                    string answer = sp.ReadByte().ToString();
+
+                    if (sign == answer)
+                        done = true;
                 }
-                if (i == 9)
-                {
-                    MessageBox.Show("Неудается открыть COM порт", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Warning);//Выдается ошибка
-                    return 0;
-                }
+                if (done == true)
+                    break;
             }
+            return done;
         }
     }
 }
