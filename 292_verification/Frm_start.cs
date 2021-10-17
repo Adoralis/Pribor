@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace _292_verification
 {
-    public partial class Form1 : MyForm
+    public partial class Frm_start : MyForm
     {
 
         Frm_numOfDevice NumOfDevice;
@@ -19,7 +11,7 @@ namespace _292_verification
 
 
         public string numOfDevice;
-        public Form1()
+        public Frm_start()
         {
             InitializeComponent();
         }

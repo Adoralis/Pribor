@@ -3,12 +3,14 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace _292_verification
 {
-    public class Device : Form
+    public class Device 
     {
         public static byte[] RecievedData;
+        public static SerialPort Port;
 
         /// <summary>
         /// Функция расчета CRC16 
@@ -18,13 +20,12 @@ namespace _292_verification
         /// <returns></returns>
         public static ushort GetCRC16(byte[] msg, ushort length)            
         {
-            const ushort polinom = 0xA001;
+            const ushort basis = 0xA001;                //основание для расчета CRC 
             ushort code = 0xFFFF;
 
             for (int i = 0; i < length; i++)
             {
                 //Для каждого байта массива
-                
                 byte FirstByte = (byte)(code);          //в FirstByte помещаем младший байт 16-ти разрядного числа code (будущий СRС16)
                 FirstByte ^= msg[i];                    //производим XOR между FirstByte и msg[i] и помещаем его в FirstByte
                 code &= 0xFF00;                         //обнуляем младший байт числа code
@@ -34,7 +35,7 @@ namespace _292_verification
                     if ((code & 0x0001) == 1)           //выделяем младший бит code и проверяем его на 1 или 0
                     {//Младший бит code = 1
                         code >>= 1;                     //сдвиг вправо на 1 бит с присвоением
-                        code ^= polinom;                //операция XOR переменных code с polinom с помещением результата в code
+                        code ^= basis;                //операция XOR переменных code с polinom с помещением результата в code
                     }
                     else
                     {//Младший бит code = 0
@@ -90,7 +91,6 @@ namespace _292_verification
                             {
                                 return false;
                             }
-
                             //CRC сошлось - расшифровка массива, выставление флага об удачном приеме ответа
                             else
                             {
@@ -106,8 +106,13 @@ namespace _292_verification
             return false;
         }//end datarecieve
 
-        //Подпрограмма  GetMessage
-        //формирует сообщение для отправки по RS-232 согласно протоколу
+ 
+        /// <summary>
+        /// Функция "упаковки" сообщения для отправки по RS-232
+        /// Рассчитывает CRC для принятых данных
+        /// </summary>
+        /// <param name="data">содержание посылки</param>
+        /// <returns></returns>
         private static byte[] GetMessage(byte[] data)
         {
             ushort code_CRC16;
@@ -126,6 +131,13 @@ namespace _292_verification
             return msg;
         }
 
+
+        /// <summary>
+        /// Функция для отправки двух байт
+        /// </summary>
+        /// <param name="data0">номер массива</param>
+        /// <param name="data1">данные</param>
+        /// <returns></returns>
         public static byte[] TransmitMessage(byte data0, byte data1)
         {
             //формирование сообщения для отправки
@@ -134,6 +146,12 @@ namespace _292_verification
 
             return message;
         }
+
+        /// <summary>
+        /// функция для отправки одного байта
+        /// </summary>
+        /// <param name="data0">нмоер массива</param>
+        /// <returns></returns>
         public static byte[] TransmitMessage(byte data0)
         {
             //формирование сообщения для отправки
@@ -143,31 +161,42 @@ namespace _292_verification
             return message;
         }
 
-        public bool Port_finder()
+
+
+        /// <summary>
+        /// Функция определения доступного COM порта
+        /// </summary>
+        /// <returns></returns>
+        public static bool  Port_finder()
         {
             string[] ports = SerialPort.GetPortNames();
-            bool done = false;
+            byte[] sign = TransmitMessage(0xFE);                                        //признак КПрА
+            bool exit = false;
 
             foreach (string port in ports)
-            {
-                string sign = "0xFE";                               //признак КПрА
-
+            {                            
                 SerialPort sp = new SerialPort();
                 sp.PortName = port;                                 
                 sp.Open();
                 if (sp.IsOpen)
                 {
-                    sp.Write(sign);
-                    Task.Delay(1000);
-                    string answer = sp.ReadByte().ToString();
+                    sp.Write(sign, 0, sign.Length);
 
-                    if (sign == answer)
-                        done = true;
+                    if (sp.BytesToRead != 0)
+                    {
+                        byte[] answer = new byte[sp.BytesToRead];
+                        sp.Read(answer, 0, answer.Length);
+                        if (sign == answer)
+                        {
+                            Port = sp;
+                            return exit = true;
+                        }
+                    }
                 }
-                if (done == true)
-                    break;
+                if (!exit)
+                    sp.Close();
             }
-            return done;
+            return exit = false;
         }
     }
 }

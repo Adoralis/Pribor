@@ -14,7 +14,10 @@ D:\C#\Pribor\292_verification\obj\Debug\292_verification.csprojResolveAssemblyRe
 D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Frm_numOfDevice.resources
 D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Frm_PPB.resources
 D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Properties.Resources.resources
-D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Form1.resources
 D:\C#\Pribor\292_verification\obj\Debug\292_verification.csproj.GenerateResource.Cache
 D:\C#\Pribor\292_verification\obj\Debug\292_verification.exe
 D:\C#\Pribor\292_verification\obj\Debug\292_verification.pdb
+D:\C#\Pribor\292_verification\bin\Debug\292_verification.exe.config
+D:\C#\Pribor\292_verification\bin\Debug\292_verification.exe
+D:\C#\Pribor\292_verification\bin\Debug\292_verification.pdb
+D:\C#\Pribor\292_verification\obj\Debug\_292_verification.Frm_start.resources

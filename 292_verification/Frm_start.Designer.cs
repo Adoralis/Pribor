@@ -1,6 +1,6 @@
 ﻿namespace _292_verification
 {
-    partial class Form1
+    partial class Frm_start
     {
         /// <summary>
         /// Обязательная переменная конструктора.
